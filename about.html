@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Maverick Academy - Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(to bottom, #0f0f0f, #1a1a1a, #000);
+      color: #00ffff;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+    .stars {
+      background: url('https://media3.giphy.com/media/FlodpfQUBSp20/giphy.gif') repeat;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.15;
+      background-size: cover;
+    }
+
+    header {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 0 20px #00ffff80;
+      backdrop-filter: blur(10px);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 30;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff;
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      transform: translateX(-20px);
+      opacity: 0.9;
+    }
+    .nav-btn {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: #00ffff;
+      background: transparent;
+      border: 2px solid #00ffff;
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .nav-btn:hover {
+      background: #00ffff;
+      color: #000;
+      box-shadow: 0 0 20px #00ffff;
+    }
+
+    .intro-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 20px 60px 20px;
+      gap: 40px;
+      flex-wrap: wrap;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 10;
+    }
+    .intro-left {
+      flex: 1 1 300px;
+      text-align: center;
+    }
+    .intro-left img {
+      width: 280px;
+      border-radius: 15px;
+      box-shadow: 0 0 30px #00ffffaa;
+      transition: transform 0.3s ease;
+    }
+    .intro-left img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 45px #00ffffee;
+    }
+    .intro-right {
+      flex: 2 1 450px;
+      color: #00ffff;
+      text-shadow: 0 0 8px #00ffffaa;
+      position: relative;
+    }
+    .intro-right h2 {
+      font-size: 38px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 15px #00ffffee;
+    }
+    .intro-right p {
+      font-size: 18px;
+      max-width: 700px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .founders-section {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: 0 auto 40px auto;
+      position: relative;
+      z-index: 10;
+    }
+    .founder-box {
+      background: rgba(0, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 300px;
+      text-align: center;
+      box-shadow: 0 0 25px #00ffff33;
+      transition: transform 0.3s ease;
+      color: #00ffffdd;
+    }
+    .founder-box:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 0 35px #00ffffaa;
+      background: rgba(0, 255, 255, 0.15);
+      color: #00ffffee;
+    }
+    .founder-box img {
+      width: 100%;
+      max-width: 220px;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 15px #00ffffbb;
+    }
+    .founder-box h3 {
+      margin: 10px 0 5px 0;
+      font-size: 24px;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffffcc;
+    }
+    .founder-box p {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #00ffffaa;
+    }
+    .social-icons {
+      margin-top: 15px;
+    }
+    .social-icons a {
+      color: #00ffffbb;
+      margin: 0 10px;
+      font-size: 20px;
+      transition: color 0.3s;
+      text-shadow: 0 0 6px #00ffffaa;
+    }
+    .social-icons a:hover {
+      color: #00ffff;
+      text-shadow: 0 0 14px #00ffffee;
+    }
+
+    @media (max-width: 1100px) {
+      .intro-right {
+        position: static;
+      }
+    }
+    @media (max-width: 700px) {
+      .intro-section {
+        flex-direction: column;
+        padding: 40px 15px 30px 15px;
+      }
+      .intro-left img {
+        width: 220px;
+      }
+      .founders-section {
+        gap: 25px;
+        padding: 25px 15px;
+      }
+    }
+
+    .ai-bot {
+      width: 320px;
+      background: rgba(0, 255, 255, 0.1);
+      border: 2px solid #00ffffaa;
+      padding: 20px 40px 20px 50px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #00ffffaa;
+      margin: 80px auto 40px;
+      text-align: center;
+      position: relative;
+      font-size: 20px;
+      font-weight: 600;
+      color: #00ffff;
+      z-index: 40;
+      overflow: hidden;
+      user-select: none;
+      opacity: 0;
+      transform: translateX(-100%);
+      animation-fill-mode: forwards;
+    }
+
+    .ai-bot-icon {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      font-size: 30px;
+      color: #00ffff;
+      filter: drop-shadow(0 0 4px #00ffffaa);
+    }
+
+    /* Slide in from left + fade in */
+    @keyframes slideFadeIn {
+      0% {
+        opacity: 0;
+        transform: translateX(-100%);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Fade out only, no slide back */
+    @keyframes fadeOutOnly {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+
+    .enroll-btn {
+      display: block;
+      margin: 20px auto 60px;
+      padding: 15px 25px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #00ffff;
+      border: 2px solid #00ffff;
+      border-radius: 10px;
+      cursor: pointer;
+      background: transparent;
+      box-shadow: 0 0 8px #00ffff;
+      transition: box-shadow 0.3s ease, border-image 0.5s ease;
+      opacity: 0.8;
+    }
+
+    /* Glow animation for enroll button */
+    @keyframes glowGradient {
+      0%, 100% {
+        border-image-source: linear-gradient(45deg, #ff0000, #ff7300, #ffeb00, #00ff00, #006eff, #9a00ff);
+      }
+      50% {
+        border-image-source: linear-gradient(45deg, #9a00ff, #006eff, #00ff00, #ffeb00, #ff7300, #ff0000);
+      }
+    }
+
+    .enroll-btn.glow {
+      animation: glowGradient 3s ease-in-out infinite;
+      border-image-slice: 1;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+
+  <header>
+    <h1>Maverick Academy</h1>
+    <div class="nav-buttons">
+      <a href="signup.html"><button class="nav-btn">Sign Up</button></a>
+      <a href="login.html"><button class="nav-btn">Sign In</button></a>
+    </div>
+  </header>
+
+  <div class="ai-bot" id="aiBot" aria-live="polite" aria-atomic="true" role="status">
+    <i class="fas fa-robot ai-bot-icon" aria-hidden="true"></i>
+    <span id="aiText">Welcome to Maverick Academy</span>
+  </div>
+
+  <section class="intro-section">
+    <div class="intro-left">
+      <img src="gy.png" alt="Student learning" />
+    </div>
+    <div class="intro-right">
+      <h2>Empowering Students Through Digital Learning</h2>
+      <p>
+        Maverick Academy is a modern education platform designed to help students access textbooks,
+        video lessons, quizzes, and downloadable content from grades 1 to 12. Whether you're studying
+        science or art, you can easily find your subject and learn at your own pace with engaging material.
+      </p>
+    </div>
+  </section>
+
+  <button class="enroll-btn" id="enrollBtn" onclick="alert('Enroll Now!')">Enroll Now</button>
+
+  <section class="founders-section" aria-label="Founders of Maverick Academy">
+    <div class="founder-box">
+      <img src="logo 2.png" alt="Maverick Logo" />
+      <h3>Maverick Academy</h3>
+      <p>
+        Maverick Academy is a startup digital school made for Ethiopian students to make education easily accessible. Founded by two friends, Dawit Abraham and Ezana Samson.
+      </p>
+      <div class="social-icons">
+        <a href="https://facebook.com" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://twitter.com" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="https://instagram.com" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+
+    <div class="founder-box">
+      <img src="lll.jpg" alt="Dawit Abraham" />
+      <h3>Dawit Abraham</h3>
+      <p>
+        Co-founder of Maverick Academy, Dawit is a passionate student and visionary who believes every child in Ethiopia deserves free and easy access to quality education.
+      </p>
+      <div class="social-icons">
+        <a href="https://facebook.com" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://twitter.com" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="https://instagram.com" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+
+    <div class="founder-box">
+      <img src="k.jpg" alt="Ezana Samson" />
+      <h3>Ezana Samson</h3>
+      <p>
+        Ezana is the creative brain behind Maverick’s user-friendly design. Her mission is to make learning fun, accessible, and meaningful for all students across Ethiopia.
+      </p>
+      <div class="social-icons">
+        <a href="https://facebook.com" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://twitter.com" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="https://instagram.com" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const messages = [
+      "Welcome to Maverick Academy",
+      "Enroll Now",
+      "Good Bye see you later"
+    ];
+    let i = 0;
+    const aiText = document.getElementById('aiText');
+    const aiBot = document.getElementById('aiBot');
+    const enrollBtn = document.getElementById('enrollBtn');
+    let glowInterval;
+
+    function showMessages() {
+      if (i < messages.length) {
+        aiText.textContent = messages[i];
+        // On first message, slide in AI bot
+        if(i === 0){
+          aiBot.style.animation = 'slideFadeIn 1s ease forwards';
+          aiBot.style.opacity = '1';
+        }
+
+        if (messages[i] === "Enroll Now") {
+          // Glow enroll button repeatedly
+          enrollBtn.classList.add('glow');
+          // Scroll smoothly to the enroll button
+          enrollBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          if (!glowInterval) {
+            glowInterval = setInterval(() => {
+              enrollBtn.classList.toggle('glow');
+            }, 3000);
+          }
+        } else {
+          // Remove glow & clear interval if not "Enroll Now"
+          enrollBtn.classList.remove('glow');
+          if (glowInterval) {
+            clearInterval(glowInterval);
+            glowInterval = null;
+          }
+        }
+
+        i++;
+
+        if (i === messages.length) {
+          // After last message, fade out only (no slide back)
+          setTimeout(() => {
+            aiBot.style.animation = 'fadeOutOnly 1.5s ease forwards';
+          }, 1500); // show last message for 2 seconds before fading out
+        }
+
+        setTimeout(showMessages, 1500);
+      }
+    }
+
+    window.onload = () => {
+      setTimeout(showMessages, 800);
+    };
+  </script>
+</body>
+</html>

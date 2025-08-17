@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Edit Profile - Maverick Academy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{margin:0;font-family:sans-serif;background:#000;color:#fff;}
+.container{max-width:400px;margin:40px auto;padding:20px;border:1px solid cyan;border-radius:10px;background:#111;text-align:center;}
+input,textarea{width:100%;padding:10px;margin:8px 0;border:none;border-radius:6px;}
+button{padding:10px 15px;margin-top:10px;border:none;border-radius:6px;cursor:pointer;background:cyan;color:black;font-weight:bold;}
+button:hover{background:#00bfff;}
+.profile-pic{width:100px;height:100px;border-radius:50%;margin-bottom:10px;border:2px solid cyan;object-fit:cover;}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Edit Profile</h2>
+  <img id="profilePic" class="profile-pic" src="logo.png">
+  <input type="file" id="picInput" accept="image/*"><br>
+  <input type="text" id="username" placeholder="Username">
+  <textarea id="bio" placeholder="Bio"></textarea>
+  <button onclick="saveProfile()">Save</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyCaFU30K1B3ngvfh9ZPbZOHtBtUaP8cuzE",authDomain:"educ-3429c.firebaseapp.com",projectId:"educ-3429c",storageBucket:"educ-3429c.appspot.com",messagingSenderId:"577708996585",appId:"1:577708996585:web:a347d5ef8663cb8e1cbd78"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();const db=firebase.firestore();const storage=firebase.storage();
+let currentUser;
+
+auth.onAuthStateChanged(async user=>{
+  if(!user){window.location.href="login.html";return;}
+  currentUser=user;
+  const snap=await db.collection("users").doc(user.uid).get();
+  if(snap.exists){
+    const data=snap.data();
+    document.getElementById("username").value=data.username||"";
+    document.getElementById("bio").value=data.bio||"";
+    document.getElementById("profilePic").src=data.photoURL||"logo.png";
+  }
+});
+
+async function saveProfile(){
+  const username=document.getElementById("username").value.trim();
+  const bio=document.getElementById("bio").value.trim();
+  let photoURL=document.getElementById("profilePic").src;
+  const file=document.getElementById("picInput").files[0];
+  if(file){
+    const ref=storage.ref().child(`profiles/${currentUser.uid}`);
+    await ref.put(file);
+    photoURL=await ref.getDownloadURL();
+  }
+  await db.collection("users").doc(currentUser.uid).set({username,bio,photoURL},{merge:true});
+  alert("Profile updated!");
+  window.location.href=`profile.html?uid=${currentUser.uid}`;
+}
+</script>
+</body>
+</html>

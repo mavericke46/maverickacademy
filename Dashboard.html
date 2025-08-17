@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student SaaS Portal - Maverick</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(to bottom, #0f0f0f, #1a1a1a, #000);
+      color: white;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .stars {
+      background: url('https://media3.giphy.com/media/FlodpfQUBSp20/giphy.gif') repeat;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.15;
+      background-size: cover;
+    }
+
+    nav {
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    nav .logo {
+      height: 50px;
+      filter: drop-shadow(0 0 5px #0ff);
+    }
+
+    .auth-buttons button {
+      margin-left: 10px;
+      padding: 10px 18px;
+      background: transparent;
+      border: 2px solid #00ffff;
+      color: #00ffff;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .auth-buttons button:hover {
+      background: #00ffff;
+      color: black;
+      box-shadow: 0 0 15px #00ffff;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 36px;
+      margin-top: 40px;
+      color: #00ffff;
+      text-shadow: 0 0 12px #00f0ff;
+    }
+
+    .grade-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 50px 20px;
+      gap: 20px;
+    }
+
+    .grade-box {
+      width: 160px;
+      height: 120px;
+      background: rgba(0, 255, 255, 0.1);
+      border: 2px solid #00ffff;
+      border-radius: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: #00ffff;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      backdrop-filter: blur(8px);
+      position: relative;
+      user-select: none;
+    }
+
+    .grade-box:hover,
+    .grade-box.active {
+      transform: translateY(-5px);
+      background: rgba(0, 255, 255, 0.3);
+      color: #000;
+      box-shadow: 0 0 20px #00ffff;
+    }
+
+    /* Dropdown content */
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 110%;
+      left: 50%;
+      transform: translateX(-50%) scale(0.9) rotateX(90deg);
+      background-color: rgba(0, 255, 255, 0.1);
+      border: 1px solid #00ffff;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 0 20px rgba(0,255,255,0.4);
+      opacity: 0;
+      width: 180px;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(10px);
+      transform-origin: top center;
+      z-index: 10;
+    }
+
+    .dropdown-content a {
+      color: #00ffff;
+      text-decoration: none;
+      display: block;
+      padding: 10px;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: rgba(0, 255, 255, 0.2);
+    }
+
+    /* Show dropdown when .open class is on the dropdown container */
+    .grade-box.dropdown.open .dropdown-content {
+      display: block;
+      opacity: 1;
+      transform: translateX(-50%) scale(1) rotateX(0deg);
+    }
+
+    @keyframes roboticAppear {
+      from {
+        transform: translateX(-50%) scale(0.6) rotateX(90deg);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(-50%) scale(1) rotateX(0deg);
+        opacity: 1;
+      }
+    }
+
+    .back-button {
+      display: block;
+      margin: 50px auto;
+      padding: 14px 28px;
+      background: transparent;
+      color: #ff4d4d;
+      border: 2px solid #ff4d4d;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      background: #ff4d4d;
+      color: #000;
+      box-shadow: 0 0 20px #ff4d4d;
+    }
+
+    @media (max-width: 600px) {
+      .grade-box {
+        width: 100px;
+        height: 100px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+
+  <nav>
+    <img src="logo.png" alt="Maverick Logo" class="logo" />
+    <div class="auth-buttons">
+      <button onclick="location.href='signup.html'">Sign Up</button>
+      <button onclick="location.href='login.html'">Sign In</button>
+    </div>
+  </nav>
+
+  <h2>Select Your Grade</h2>
+  <div class="grade-container">
+    <div class="grade-box" onclick="selectGrade(this); window.location.href='Grade1_Natural.html'">Grade 1</div>
+    <div class="grade-box" onclick="selectGrade(this); window.location.href='Grade2_Natural.html'">Grade 2</div>
+    <div class="grade-box" onclick="selectGrade(this); window.location.href='Grade3_Natural.html'">Grade 3</div>
+    <div class="grade-box" onclick="selectGrade(this); window.location.href='Grade4_Natural.html'">Grade 4</div>
+    <div class="grade-box" onclick="selectGrade(this); window.location.href='Grade5_Natural.html'">Grade 5</div>
+    <div class="grade-box" onclick="selectGrade(this); window.location.href='Grade6_Natural.html'">Grade 6</div>
+    <div class="grade-box" onclick="selectGrade(this); window.location.href='Grade7_Natural.html'">Grade 7</div>
+    <div class="grade-box" onclick="selectGrade(this); window.location.href='Grade8_Natural.html'">Grade 8</div>
+    <div class="grade-box" onclick="selectGrade(this); window.location.href='Grade9_Natural.html'">Grade 9</div>
+    <div class="grade-box" onclick="selectGrade(this); window.location.href='Grade10_Natural.html'">Grade 10</div>
+
+    <div class="grade-box dropdown" tabindex="0">
+      Grade 11 ▼
+      <div class="dropdown-content">
+        <a href="Grade11_Natural.html">Natural</a>
+        <a href="Grade11_Social.html">Social</a>
+      </div>
+    </div>
+
+    <div class="grade-box dropdown" tabindex="0">
+      Grade 12 ▼
+      <div class="dropdown-content">
+        <a href="Grade12_Natural.html">Natural</a>
+        <a href="Grade12_Social.html">Social</a>
+      </div>
+    </div>
+  </div>
+
+  <button class="back-button" onclick="goBack()">← Go Back</button>
+
+  <script>
+    function goBack() {
+      if (document.referrer) {
+        history.back();
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    }
+
+    function selectGrade(el) {
+      document.querySelectorAll('.grade-box').forEach(box => box.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    // Show dropdown on mouse enter, hide on mouse leave using class toggle
+    document.querySelectorAll('.grade-box.dropdown').forEach(box => {
+      box.addEventListener('mouseenter', () => {
+        box.classList.add('open');
+      });
+
+      box.addEventListener('mouseleave', () => {
+        box.classList.remove('open');
+      });
+    });
+
+    // Hide dropdown only when a dropdown link is clicked
+    document.querySelectorAll('.dropdown-content a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const dropdownBox = e.target.closest('.grade-box.dropdown');
+        if (dropdownBox) {
+          dropdownBox.classList.remove('open');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

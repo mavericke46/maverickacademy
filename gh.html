@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Multiple Choice Quiz - Grade 11 Math</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to bottom, #0f0f0f, #1a1a1a, #000);
+      color: #00ffff;
+      font-family: 'Orbitron', sans-serif;
+      padding: 20px;
+      text-align: center;
+      margin: 0;
+    }
+
+    .stars {
+      background: url('https://media3.giphy.com/media/FlodpfQUBSp20/giphy.gif') repeat;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.1;
+      background-size: cover;
+    }
+
+    h2 {
+      font-size: 32px;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff;
+      margin-bottom: 30px;
+    }
+
+    .question-box {
+      background: rgba(0, 255, 255, 0.05);
+      border: 2px solid #00ffff;
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 700px;
+      margin: 0 auto 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 20px #00ffff33;
+    }
+
+    button.answer-btn {
+      background: transparent;
+      border: 2px solid #00ffff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      color: #00ffff;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 10px 5px;
+      font-size: 16px;
+      width: 100%;
+      max-width: 300px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      transition: 0.3s;
+    }
+
+    button.answer-btn:hover {
+      background: #00ffff;
+      color: black;
+      box-shadow: 0 0 15px #00ffff;
+    }
+
+    .result {
+      font-size: 18px;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      display: inline-block;
+      max-width: 600px;
+    }
+
+    .correct {
+      background-color: #00ff99;
+      color: #000;
+      box-shadow: 0 0 10px #00ff99;
+    }
+
+    .incorrect {
+      background-color: #ff4d4d;
+      color: white;
+      box-shadow: 0 0 10px #ff4d4d;
+    }
+
+    .finish-btn {
+      background: #ff0066;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      color: #fff;
+      margin-top: 10px;
+      transition: 0.3s;
+      box-shadow: 0 0 10px #ff0066;
+    }
+
+    .finish-btn:hover {
+      background: #ff4081;
+      box-shadow: 0 0 16px #ff0066;
+    }
+
+    .score-section {
+      margin-top: 30px;
+    }
+
+    .circle {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: conic-gradient(#00ffff calc(var(--score) * 1%), rgba(0,255,255,0.1) 0%);
+      margin: 20px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      position: relative;
+      transition: background 1s ease;
+    }
+
+    .circle::after {
+      content: "";
+      width: 120px;
+      height: 120px;
+      background: #0f0f0f;
+      border-radius: 50%;
+      position: absolute;
+    }
+
+    .score-text {
+      position: absolute;
+    }
+
+    .back-button {
+      background: transparent;
+      border: 2px solid #ff4d4d;
+      color: #ff4d4d;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 40px;
+      transition: 0.3s;
+    }
+
+    .back-button:hover {
+      background: #ff4d4d;
+      color: black;
+      box-shadow: 0 0 15px #ff4d4d;
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+
+  <h2>🧠 Multiple Choice Quiz</h2>
+
+  <div class="question-box" id="quiz">
+    <h3 id="question">Loading Question...</h3>
+    <div id="answers"></div>
+    <div id="feedback"></div>
+  </div>
+
+  <button class="finish-btn" onclick="finishQuiz()">Finish Quiz</button>
+
+  <div class="score-section" id="scoreSection" style="display: none;">
+    <div class="circle" id="scoreCircle" style="--score:0;">
+      <div class="score-text" id="scoreText">0%</div>
+    </div>
+    <p id="finalScore"></p>
+    <button onclick="continueQuiz()" class="finish-btn">Continue Remaining Questions</button>
+  </div>
+
+  <button class="back-button" onclick="window.history.back()">← Back to Math Menu</button>
+
+  <script>
+    const questions = [
+      {
+        question: "What is 2 + 3?",
+        options: ["4", "5", "6"],
+        answerIndex: 1
+      },
+      {
+        question: "What number comes after 7?",
+        options: ["6", "8", "9"],
+        answerIndex: 1
+      },
+      {
+        question: "Which is the largest number?",
+        options: ["10", "15", "12"],
+        answerIndex: 1
+      },
+      {
+        question: "What color do you get mixing red and white?",
+        options: ["Pink", "Purple", "Orange"],
+        answerIndex: 0
+      },
+      // Add up to 15 questions here
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function loadQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById("question").innerText = `Q${currentQuestion + 1}: ${q.question}`;
+      const answersDiv = document.getElementById("answers");
+      answersDiv.innerHTML = "";
+      document.getElementById("feedback").innerHTML = "";
+
+      q.options.forEach((option, index) => {
+        const btn = document.createElement("button");
+        btn.classList.add("answer-btn");
+        btn.innerText = option;
+        btn.onclick = () => checkAnswer(index);
+        answersDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedIndex) {
+      const q = questions[currentQuestion];
+      const feedback = document.getElementById("feedback");
+
+      document.querySelectorAll(".answer-btn").forEach(btn => btn.disabled = true);
+
+      if (selectedIndex === q.answerIndex) {
+        score++;
+        feedback.innerHTML = `<div class="result correct">✅ Correct!</div>`;
+      } else {
+        const correctAnswer = q.options[q.answerIndex];
+        feedback.innerHTML = `<div class="result incorrect">❌ Incorrect! Correct answer is "${correctAnswer}".</div>`;
+      }
+
+      setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < questions.length && currentQuestion < 15) {
+          loadQuestion();
+        } else {
+          finishQuiz();
+        }
+      }, 2500);
+    }
+
+    function finishQuiz() {
+      document.getElementById("quiz").style.display = "none";
+      document.getElementById("scoreSection").style.display = "block";
+
+      const percentage = Math.round((score / questions.length) * 100);
+      document.getElementById("scoreCircle").style.setProperty("--score", percentage);
+      document.getElementById("scoreText").innerText = `${percentage}%`;
+      document.getElementById("finalScore").innerText = `Your Score: ${score} out of ${questions.length}`;
+
+      if (currentQuestion >= questions.length) {
+        document.querySelector("#scoreSection button").style.display = "none";
+      } else {
+        document.querySelector("#scoreSection button").style.display = "inline-block";
+      }
+    }
+
+    function continueQuiz() {
+      loadQuestion();
+      document.getElementById("scoreSection").style.display = "none";
+      document.getElementById("quiz").style.display = "block";
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>

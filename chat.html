@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maverick Academy - Chat</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #000;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+#chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  border-bottom: 1px solid rgba(0,255,255,0.2);
+  background: #0f0f0f;
+  color: #00ffff;
+  font-weight: bold;
+}
+#backBtn {
+  background: none;
+  border: none;
+  color: #00ffff;
+  font-size: 16px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+#chat-title {
+  flex: 1;
+  text-align: center;
+  position: relative;
+}
+#notifBadge {
+  position: absolute;
+  top: -5px;
+  right: -15px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  display: none;
+}
+#chat-box {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.message {
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 60%;
+  word-wrap: break-word;
+}
+.message.sent {
+  background: #00ffff;
+  color: #000;
+  align-self: flex-end;
+}
+.message.received {
+  background: #333;
+  align-self: flex-start;
+}
+.message img, .message video {
+  max-width: 100%;
+  border-radius: 8px;
+}
+#chat-input {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid rgba(0,255,255,0.2);
+  background: #0f0f0f;
+}
+#chat-input input[type="text"] {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  outline: none;
+  background: #000;
+  color: #fff;
+}
+#chat-input button {
+  padding: 12px 16px;
+  background: #00ffff;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 5px;
+}
+</style>
+</head>
+<body>
+<div id="chat-header">
+  <button id="backBtn">&larr; Back</button>
+  <div id="chat-title">
+    Chat
+    <div id="notifBadge">0</div>
+  </div>
+  <div style="width:40px"></div>
+</div>
+
+<div id="chat-box"></div>
+
+<div id="chat-input">
+  <input type="text" id="messageInput" placeholder="Type a message...">
+  <input type="file" id="fileInput" accept="image/*,video/*" style="display:none">
+  <button id="fileBtn">📎</button>
+  <button id="sendBtn">Send</button>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCaFU30K1B3ngvfh9ZPbZOHtBtUaP8cuzE",
+  authDomain: "educ-3429c.firebaseapp.com",
+  projectId: "educ-3429c",
+  storageBucket: "educ-3429c.appspot.com",
+  messagingSenderId: "577708996585",
+  appId: "1:577708996585:web:a347d5ef8663cb8e1cbd78"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+const chatBox = document.getElementById("chat-box");
+const sendBtn = document.getElementById("sendBtn");
+const messageInput = document.getElementById("messageInput");
+const backBtn = document.getElementById("backBtn");
+const notifBadge = document.getElementById("notifBadge");
+const fileBtn = document.getElementById("fileBtn");
+const fileInput = document.getElementById("fileInput");
+
+backBtn.onclick = () => {
+  window.location.href = "explore.html";
+};
+
+// ✅ Get user IDs from URL (?me=uid1&with=uid2)
+const urlParams = new URLSearchParams(window.location.search);
+const me = urlParams.get("me");
+const otherUser = urlParams.get("with");
+
+// ✅ Stable conversation ID
+function generateConversationId(uid1, uid2) {
+  return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
+}
+const conversationId = generateConversationId(me, otherUser);
+
+let unreadCount = 0;
+
+function renderMessage(msg, currentUser) {
+  const div = document.createElement("div");
+  div.className = "message " + (msg.sender === currentUser ? "sent" : "received");
+
+  if (msg.type === "image") {
+    div.innerHTML = `<img src="${msg.url}" alt="Image">`;
+  } else if (msg.type === "video") {
+    div.innerHTML = `<video src="${msg.url}" controls></video>`;
+  } else {
+    div.textContent = msg.text;
+  }
+
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// ✅ Update lastSeen
+async function updateLastSeen(uid) {
+  await db.collection("conversations").doc(conversationId)
+    .collection("readStatus").doc(uid)
+    .set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+}
+
+auth.onAuthStateChanged(user => {
+  if (!user) {
+    alert("Please login first!");
+    window.location.href = "login.html";
+    return;
+  }
+
+  // ✅ Listen for messages
+  db.collection("conversations").doc(conversationId)
+    .collection("messages")
+    .orderBy("timestamp")
+    .onSnapshot(snapshot => {
+      chatBox.innerHTML = "";
+      snapshot.forEach(doc => {
+        const msg = doc.data();
+        renderMessage(msg, user.uid);
+
+        if (msg.sender !== user.uid) {
+          unreadCount++;
+          notifBadge.style.display = "block";
+          notifBadge.textContent = unreadCount;
+        }
+      });
+    });
+
+  // ✅ Mark as read on open
+  updateLastSeen(user.uid);
+
+  // ✅ Send text message
+  sendBtn.onclick = async () => {
+    const text = messageInput.value.trim();
+    if (!text) return;
+
+    const msg = {
+      sender: user.uid,
+      text,
+      type: "text",
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    await db.collection("conversations").doc(conversationId).collection("messages").add(msg);
+
+    await db.collection("conversations").doc(conversationId).set({
+      participants: [me, otherUser],
+      lastMessage: text,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    messageInput.value = "";
+    updateLastSeen(user.uid);
+  };
+
+  // ✅ File upload
+  fileBtn.onclick = () => fileInput.click();
+
+  fileInput.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const fileType = file.type.startsWith("video") ? "video" : "image";
+    const storageRef = storage.ref(`chatMedia/${conversationId}/${Date.now()}_${file.name}`);
+
+    const uploadTask = storageRef.put(file);
+
+    uploadTask.on("state_changed",
+      (snapshot) => {
+        let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("Upload is " + progress + "% done");
+      },
+      (error) => {
+        console.error("Upload failed:", error);
+        alert("File upload failed: " + error.message);
+      },
+      async () => {
+        const url = await uploadTask.snapshot.ref.getDownloadURL();
+
+        await db.collection("conversations").doc(conversationId).collection("messages").add({
+          sender: user.uid,
+          type: fileType,
+          url,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        fileInput.value = "";
+      }
+    );
+  };
+
+  // ✅ Reset badge on focus
+  messageInput.addEventListener("focus", () => {
+    unreadCount = 0;
+    notifBadge.style.display = "none";
+    updateLastSeen(user.uid);
+  });
+});
+</script>
+</body>
+</html>

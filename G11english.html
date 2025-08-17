@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Mathematics Hub - Maverick Academy</title>
+  <style>
+     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom, #0f0f0f, #1a1a1a, #000000);
+      font-family: 'Orbitron', sans-serif;
+      color: #ff0000;
+      min-height: 100vh;
+      overflow-x: hidden;
+      text-shadow: 0 0 15px #00f0ff;
+    }
+    .stars {
+      background: url('https://media3.giphy.com/media/FlodpfQUBSp20/giphy.gif') repeat;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.15;
+      background-size: cover;
+    }
+    nav {
+      background: #111;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #00ffe7;
+    }
+    .logo {
+      height: 50px;
+      filter: drop-shadow(0 0 5px #0ff);
+    }
+    .nav-title {
+      color: #00ffe7;
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .container {
+      padding: 60px 20px;
+      max-width: 1000px;
+      margin: auto;
+      text-align: center;
+    }
+    h2 {
+      font-size: 32px;
+      color: #00ffe7;
+      margin-bottom: 40px;
+    }
+    .action-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+    .btn {
+      padding: 20px;
+      background: rgba(0, 255, 231, 0.1);
+      border: 2px solid #00ffe7;
+      color: #00ffff;
+      border-radius: 12px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: bold;
+      backdrop-filter: blur(6px);
+    }
+    .btn:hover {
+        transform: translateY(-5px);
+      background: rgba(0, 255, 255, 0.3);
+      color: #000;
+      box-shadow: 0 0 25px #00ffff;
+    }
+    .back-button {
+      margin-top: 50px;
+      padding: 12px 30px;
+      background: black;
+      color: rgb(255, 0, 0);
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s ease-in-out;
+      border: 2px solid #ff4d4d;
+    }
+    .back-button:hover {
+      color: #222;
+      background-color: #ff4d4d;
+      
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+
+  <nav>
+    <img src="logo.png" alt="Maverick Logo" class="logo">
+    <span class="nav-title">AI Math Hub - Grade 11</span>
+  </nav>
+
+  <div class="container">
+    <h2>Welcome to Your Smart Learning Portal</h2>
+    <div class="action-buttons">
+      <button class="btn" onclick="window.location.href='11lke.html'">📺 AI-Powered Video Lessons</button>
+      <button class="btn" onclick="window.location.href='11lbe.html'">📘 Interactive e-Textbook</button>
+      <button class="btn" onclick="window.location.href='11dle.html'">⬇️ Download Smart PDF</button>
+      <button class="btn" onclick="window.location.href='11Practicee.html'">📝 Adaptive Practice</button>
+      <button class="btn" onclick="window.location.href='11Gamee.html'">🧩 Math Puzzle Zone</button>
+    </div>
+    <button class="back-button" onclick="window.history.back()">← Return to Subjects</button>
+  </div>
+
+</body>
+</html>

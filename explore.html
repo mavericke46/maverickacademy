@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Explore - Maverick Academy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    background: #000;
+    color: white;
+  }
+  .container {
+    padding: 20px;
+    text-align: center;
+  }
+  h2 {
+    color: cyan;
+    margin-bottom: 20px;
+  }
+  .users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .user-card {
+    background: #111;
+    border: 1px solid cyan;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  .user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 10px cyan;
+  }
+  .user-pic {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 2px solid cyan;
+    object-fit: cover;
+  }
+  .username {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 14px;
+    color: white;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    display: block;
+  }
+  .verified {
+    color: cyan;
+    font-size: 14px;
+    margin-left: 6px;
+  }
+  .view-btn, .chat-btn {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: cyan;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    color: black;
+    transition: 0.2s;
+    display: inline-block;
+    position: relative;
+  }
+  .view-btn:hover, .chat-btn:hover {
+    background: #00bfff;
+  }
+  .badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    display: none;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h2>Explore Users</h2>
+    <div id="usersGrid" class="users-grid"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCaFU30K1B3ngvfh9ZPbZOHtBtUaP8cuzE",
+      authDomain: "educ-3429c.firebaseapp.com",
+      projectId: "educ-3429c",
+      storageBucket: "educ-3429c.appspot.com",
+      messagingSenderId: "577708996585",
+      appId: "1:577708996585:web:a347d5ef8663cb8e1cbd78"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser;
+
+    // ✅ List of verified emails (add as many as you want)
+    const verifiedEmails = [
+      "maverickaa21@gmail.com",
+      "owner@maverick.com",
+      "admin@maverick.com"
+    ];
+
+    function generateConversationId(uid1, uid2) {
+      return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
+    }
+
+    auth.onAuthStateChanged(async user => {
+      if (!user) {
+        alert("Please login first!");
+        window.location.href = "login.html";
+        return;
+      }
+      currentUser = user;
+      loadUsers();
+    });
+
+    async function loadUsers() {
+      const grid = document.getElementById("usersGrid");
+      grid.innerHTML = "";
+
+      const snap = await db.collection("users").get();
+      let users = [];
+
+      snap.forEach(doc => {
+        if (doc.id !== currentUser.uid) {
+          users.push({ uid: doc.id, ...doc.data() });
+        }
+      });
+
+      users.forEach(u => {
+        const card = document.createElement("div");
+        card.className = "user-card";
+
+        // ✅ Only check verifiedEmails
+        const isVerified = verifiedEmails.includes(u.email);
+
+        card.innerHTML = `
+          <img src="${u.photoURL || 'logo.png'}" class="user-pic">
+          <div class="username">
+            ${u.username || "Unnamed"}
+            ${isVerified ? '<span class="verified">✔️</span>' : ""}
+          </div>
+          <button class="view-btn">View Profile</button>
+          <button class="chat-btn">
+            Chat
+            <span class="badge" id="badge_${u.uid}">0</span>
+          </button>
+        `;
+
+        card.querySelector(".view-btn").onclick = () => {
+          window.location.href = `uprofile.html?uid=${u.uid}`;
+        };
+        card.querySelector(".chat-btn").onclick = () => {
+          window.location.href = `chat.html?me=${currentUser.uid}&with=${u.uid}`;
+        };
+
+        grid.appendChild(card);
+        setupBadge(u.uid);
+      });
+    }
+
+    function setupBadge(uid) {
+      const conversationId = generateConversationId(currentUser.uid, uid);
+      const badge = document.getElementById(`badge_${uid}`);
+
+      db.collection("conversations").doc(conversationId)
+        .collection("readStatus").doc(currentUser.uid)
+        .onSnapshot(readSnap => {
+          const lastSeen = readSnap.exists ? readSnap.data().lastSeen?.toMillis() || 0 : 0;
+
+          db.collection("conversations").doc(conversationId)
+            .collection("messages")
+            .orderBy("timestamp")
+            .onSnapshot(snapshot => {
+              let unread = 0;
+              snapshot.forEach(doc => {
+                const msg = doc.data();
+                if (msg.sender !== currentUser.uid && msg.timestamp?.toMillis() > lastSeen) {
+                  unread++;
+                }
+              });
+              if (unread > 0) {
+                badge.style.display = "inline-block";
+                badge.textContent = unread;
+              } else {
+                badge.style.display = "none";
+              }
+            });
+        });
+    }
+  </script>
+</body>
+</html>
