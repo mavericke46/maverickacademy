@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Dashboard - Maverick Academy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+<!-- Orbitron Font -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(to bottom, #0f0f0f, #1a1a1a, #000000);
+  color: #ffffff;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 0;
+  box-shadow: 3px 0 10px rgba(0,255,255,0.3);
+  transition: width 0.3s;
+  backdrop-filter: blur(10px);
+}
+.sidebar.collapsed { width: 70px; }
+
+/* Top logo */
+#sidebar-logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #00ffff;
+  text-align: center;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(0,255,255,0.2);
+  white-space: nowrap;
+}
+
+/* Nav buttons */
+.nav-section {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+}
+.sidebar button {
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  color: #00ffff;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: background 0.3s, color 0.3s;
+  position: relative;
+}
+.sidebar button::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  transition: width 0.3s;
+  z-index: -1;
+}
+.sidebar button:hover::before { width: 100%; }
+.sidebar button:hover { color: white; }
+.sidebar button.active { background: linear-gradient(90deg,#00c6ff,#0072ff); color:white; }
+.sidebar.collapsed .label { display: none; }
+
+/* Bottom profile */
+.bottom-section {
+  border-top: 1px solid rgba(0,255,255,0.2);
+  padding-top: 10px;
+}
+#sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+#sidebar-profile:hover { background: rgba(0,255,255,0.1); }
+#sidebar-profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #00ffff;
+  object-fit: cover;
+}
+#sidebar-profile .username {
+  color: #00ffff;
+  font-weight: bold;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.sidebar.collapsed #sidebar-profile .username { display: none; }
+
+/* Main content */
+#main-content {
+  flex: 1;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+#content-frame { border:none; width:100%; height:100vh; flex-grow:1; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="sidebar" id="sidebar">
+    
+    <!-- Top Logo -->
+    <div id="sidebar-logo">Maverick</div>
+    
+    <!-- Middle Nav -->
+    <div class="nav-section">
+      <button onclick="loadPage('about.html')" class="active">📊 <span class="label">Dashboard</span></button>
+      <button onclick="loadPage('search.html')">🔎 <span class="label">Search</span></button>
+      <button onclick="loadPage('explore.html')">🔍 <span class="label">Explore</span></button>
+      <button onclick="loadPage('reels.html')">🎥 <span class="label">Reels</span></button>
+      <button onclick="loadPage('messages.html')">💬 <span class="label">Messages</span></button>
+      <button onclick="loadPage('notifications.html')">❤️ <span class="label">Notifications</span></button>
+      <button onclick="loadPage('upload.html')">➕ <span class="label">Create</span></button>
+      <button onclick="loadPage('dashboard.html')">🧑‍🏫 <span class="label">E-Learning</span></button>
+      <button onclick="loadPage('equipment.html')">🛠️ <span class="label">Equipment</span></button>
+      <button onclick="loadPage('donation.html')">💰 <span class="label">Donate</span></button>
+    </div>
+
+    <!-- Bottom Profile -->
+    <div class="bottom-section">
+      <div id="sidebar-profile" onclick="loadPage('profile.html')">
+        <img id="sidebar-profile-pic" src="logo.png" alt="Profile Picture">
+        <div class="username" id="sidebar-username">Username</div>
+      </div>
+      <button onclick="logout()">🔓 <span class="label">Log out</span></button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div id="main-content">
+    <iframe id="content-frame" src="about.html"></iframe>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCaFU30K1B3ngvfh9ZPbZOHtBtUaP8cuzE",
+  authDomain: "educ-3429c.firebaseapp.com",
+  projectId: "educ-3429c",
+  storageBucket: "educ-3429c.appspot.com",
+  messagingSenderId: "577708996585",
+  appId: "1:577708996585:web:a347d5ef8663cb8e1cbd78"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let currentUser = null;
+auth.onAuthStateChanged(async (user) => {
+  if(user){
+    currentUser = user;
+    const doc = await db.collection('users').doc(user.uid).get();
+    if(doc.exists){
+      const data = doc.data();
+      document.getElementById('sidebar-username').textContent = data.username || "Username";
+      document.getElementById('sidebar-profile-pic').src = data.photoURL || "logo.png";
+    }
+  } else {
+    currentUser = null;
+  }
+});
+
+function loadPage(page){
+  if (!currentUser) {
+    if (confirm("⚠️ Please login first!\n\nPress OK to go to login page.")) {
+      window.location.href = "login.html";
+    }
+    return;
+  }
+  document.getElementById('content-frame').src = page;
+  document.querySelectorAll('.sidebar button').forEach(btn=>btn.classList.remove('active'));
+  const btn = [...document.querySelectorAll('.sidebar button')].find(b=>b.getAttribute('onclick')?.includes(page));
+  if(btn) btn.classList.add('active');
+}
+
+function logout(){
+  auth.signOut().then(()=>{ window.location.href = "login.html"; });
+}
+</script>
+</body>
+</html>
