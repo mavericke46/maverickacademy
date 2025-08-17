@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up - Maverick Academy</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
+      color: #00ffff;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .signup-container {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+      padding: 40px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 0 25px #00ffe088;
+      border: 1px solid #00ffe044;
+      animation: fadeIn 1.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 26px;
+      font-weight: 700;
+      color: #00ffff;
+      text-shadow: 0 0 5px #00ffe088;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 12px;
+      background: #ffffffee;
+      color: #111;
+      font-size: 15px;
+      font-weight: 600;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #00b894, #0984e3);
+      border: none;
+      border-radius: 25px;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.3s ease;
+      box-shadow: 0 0 15px #00ffe088;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px #00ffe0aa;
+    }
+
+    .message {
+      margin-top: 12px;
+      font-size: 14px;
+      text-align: center;
+      min-height: 18px;
+      color: #fff;
+    }
+
+    .login-link {
+      display: block;
+      margin-top: 16px;
+      text-align: center;
+      color: #74b9ff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.3s ease;
+    }
+
+    .login-link:hover {
+      color: #00cec9;
+      text-shadow: 0 0 6px #00ffe0aa;
+    }
+
+    .login-link:active {
+      color: #e17055;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="signup-container">
+    <h2>Create Account</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password (min 6 chars)" />
+    <button onclick="signUp()">Sign Up</button>
+    <a href="login.html" class="login-link">Already have an account?</a>
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCaFU30K1B3ngvfh9ZPbZOHtBtUaP8cuzE",
+      authDomain: "educ-3429c.firebaseapp.com",
+      projectId: "educ-3429c",
+      storageBucket: "educ-3429c.appspot.com",
+      messagingSenderId: "577708996585",
+      appId: "1:577708996585:web:a347d5ef8663cb8e1cbd78"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    async function signUp() {
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const message = document.getElementById('message');
+
+      message.textContent = '';
+      message.style.color = 'white';
+
+      if (!username) {
+        message.textContent = "Please enter a username.";
+        message.style.color = "orange";
+        return;
+      }
+
+      if (!email) {
+        message.textContent = "Please enter your email.";
+        message.style.color = "orange";
+        return;
+      }
+
+      if (!password || password.length < 6) {
+        message.textContent = "Password must be at least 6 characters.";
+        message.style.color = "orange";
+        return;
+      }
+
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        await db.collection('users').doc(user.uid).set({
+          username: username,
+          bio: '',
+          profilePictureURL: '',
+          email: user.email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+
+        message.textContent = "✅ Account created successfully! Redirecting...";
+        message.style.color = "#00cec9";
+
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1500);
+
+      } catch (error) {
+        message.textContent = `❌ ${error.message}`;
+        message.style.color = "red";
+      }
+    }
+  </script>
+
+</body>
+</html>
